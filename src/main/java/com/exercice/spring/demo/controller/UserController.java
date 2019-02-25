@@ -33,6 +33,7 @@ public class UserController {
         mv.setViewName(INDEX_HTML);
         // par défaut quand on affiche la page le tableau est vide
         mv.addObject("users", new ArrayList<>());
+        mv.addObject("searchAlreadyStart", false);
 
         return mv;
     }
@@ -48,6 +49,8 @@ public class UserController {
         ModelAndView mv = new ModelAndView();
         mv.setViewName(INDEX_HTML); // on affiche le tableau sur la même page
         mv.addObject("users", users);
+        mv.addObject("searchAlreadyStart", true);
+
         return mv;
     }
 
