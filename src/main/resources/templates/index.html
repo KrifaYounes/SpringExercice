@@ -16,6 +16,15 @@
     </form>
 </div>
 
+<div>
+    <span>Create User</span>
+    <form action="/saveUser" method="POST">
+        Last Name :   <input name="lastName">
+        First Name :  <input name="firstName">
+        <button type="submit"> Submit</button>
+    </form>
+</div>
+
 <br/>
 
 <div th:if="${searchAlreadyStart}">

@@ -6,6 +6,7 @@ import com.exercice.spring.demo.repository.UserRepository;
 import com.exercice.spring.demo.repository.specification.UserSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -17,11 +18,26 @@ public class UserService {
 
     public List<User> searchUser(UserDto dto) {
         UserSpecification userSpecification = new UserSpecification(dto);
-        //return userRepository.findByLastNameAndFirstName(dto.getFirstName(), dto.getLastName());
 
         // Genération d'une requete dynamique
         return userRepository.findAll(userSpecification);
 
     }
 
+    public User saveOrUpdate(UserDto dto) {
+        UserSpecification userSpecification = new UserSpecification(dto);
+        List<User> users = searchUser(dto);
+        if(!CollectionUtils.isEmpty(users)) {
+            User user = users.get(0);
+            user.setFirstName("tototototo");
+            user.setLastName("tototototo");
+            return userRepository.save(user);
+        }
+
+        User user = new User();
+        user.setLastName(dto.getLastName());
+        user.setFirstName(dto.getFirstName());
+        return userRepository.save(user);
+
+    }
 }

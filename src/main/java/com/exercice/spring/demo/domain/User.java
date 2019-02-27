@@ -5,7 +5,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name="user_exercice")
-public class User {
+public class User extends AbstractAuditEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -46,7 +46,7 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) &&
+        return  Objects.equals(id, user.id) &&
                 Objects.equals(lastName, user.lastName) &&
                 Objects.equals(firstName, user.firstName);
     }

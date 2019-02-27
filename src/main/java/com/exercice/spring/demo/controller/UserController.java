@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -56,8 +57,12 @@ public class UserController {
 
     @PostMapping("/saveUser")
     public ModelAndView saveUser(UserDto userDto) {
-        // sauvegarde d'un utilisateur puis afficher son nom, prénom dans une nouvelle page
-        // welcome.html par exemple
-        return null;
+        User user = userService.saveOrUpdate(userDto);
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName(INDEX_HTML);
+        mv.addObject("users", Arrays.asList(user));
+        mv.addObject("searchAlreadyStart", true);
+
+        return mv;
     }
 }
