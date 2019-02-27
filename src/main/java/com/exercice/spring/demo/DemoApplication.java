@@ -18,20 +18,6 @@ public class DemoApplication implements CommandLineRunner {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
-
-		// une map permet de stocker des objets de la maniére key, value
-		// une map fonction fonctionne avec une key et une value
-		// Map<key,value>
-		// une map ne peut contenir qu'une seule clé dans sa liste
-		// impossible d'avoir deux clé identiques avec deux value
-		Map<User, String> map = new HashMap<>();
-		User user1 = new User();
-		user1.setLastName("firstName");
-		User user2 = new User();
-		user2.setLastName("firstName");
-		map.put(user1, "Bonjour");
-		map.put(user2, "Bonjour 2");
-		System.out.println(map.size()); //la taille de la map est de un
 	}
 
 	@Autowired
@@ -44,6 +30,8 @@ public class DemoApplication implements CommandLineRunner {
 	 */
 	@Override
 	public void run(String... args) {
+		userRepository.deleteAll();
+
 		User user1 = new User();
 		user1.setFirstName("toto");
 		user1.setLastName("tata");
