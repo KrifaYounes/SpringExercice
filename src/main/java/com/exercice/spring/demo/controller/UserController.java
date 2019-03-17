@@ -4,10 +4,12 @@ import com.exercice.spring.demo.domain.User;
 import com.exercice.spring.demo.dto.UserDto;
 import com.exercice.spring.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,12 +59,12 @@ public class UserController {
 
     @PostMapping("/saveUser")
     public ModelAndView saveUser(UserDto userDto) {
-        User user = userService.saveOrUpdate(userDto);
-        ModelAndView mv = new ModelAndView();
-        mv.setViewName(INDEX_HTML);
-        mv.addObject("users", Arrays.asList(user));
-        mv.addObject("searchAlreadyStart", true);
-
-        return mv;
+        userService.saveUser(userDto);
+        //permet de changer l'url quand on va atterir sur la page de login
+        return new ModelAndView(new RedirectView("login"));
+        //Remarque: si on fait ça :
+        //ModelAndView mv = new ModelAndView();
+        //mv.setViewName("login");
+        // on va montrer le formulaire de login avec une url = saveUser
     }
 }
