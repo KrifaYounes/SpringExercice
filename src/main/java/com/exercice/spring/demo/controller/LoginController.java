@@ -35,6 +35,7 @@ public class LoginController {
     }
 
     @GetMapping("/admin")
+    @Secured("ADMIN") // uniquement les utilisateurs avec le role ADMIN peuvent accèder à la page ADMIN
     public ModelAndView showAdminPage() {
         ModelAndView model = new ModelAndView();
         model.setViewName("admin");
