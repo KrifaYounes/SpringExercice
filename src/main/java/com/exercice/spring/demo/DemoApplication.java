@@ -25,6 +25,7 @@ public class DemoApplication implements CommandLineRunner {
 
 	@Autowired
 	private UserRepository userRepository;
+
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -37,12 +38,10 @@ public class DemoApplication implements CommandLineRunner {
 	public void run(String... args) {
 		userRepository.deleteAll();
 
-		String passwordNotEncrypted = "123456";
+		String passwordNotEncrypted = "monastir";
 		Role roleAdmin = new Role();
 		roleAdmin.setRole(RoleEnum.ADMIN.name());
 
-		Role roleNoAdmin = new Role();
-		roleNoAdmin.setRole(RoleEnum.NO_ADMIN.name());
 
 		User user1 = new User();
 		user1.setFirstName("Administrateur");
@@ -52,6 +51,10 @@ public class DemoApplication implements CommandLineRunner {
 		// mais lorsque l'utilisateur va saisir son mot de passe depuis l'IHM il faut
 		// qu'il saissise son mot de passe non encrypté. dans notre exemple password = 123456
 		user1.setPassword(bCryptPasswordEncoder.encode(passwordNotEncrypted));
+
+		Role roleNoAdmin = new Role();
+		roleNoAdmin.setRole(RoleEnum.NO_ADMIN.name());
+
 		user1.addRoles(roleAdmin);
 		userRepository.save(user1);
 

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 @Controller
 public class LoginController {
 
-
     // si l'utilisateur veut afficher la page login on vérifie si il est connecté
     // si il est connecté on le redirige directement sur la page admin
     // sans lui montrer la page login (car il est déjà connecté)

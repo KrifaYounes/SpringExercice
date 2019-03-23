@@ -43,6 +43,10 @@ public class User extends AbstractAuditEntity{
         this.getRoles().add(role);
     }
 
+    public User email(String email) {
+        this.setEmail(email);
+        return this;
+    }
     public Long getId() {
         return id;
     }

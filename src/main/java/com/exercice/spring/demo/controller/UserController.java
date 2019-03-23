@@ -1,6 +1,7 @@
 package com.exercice.spring.demo.controller;
 
 import com.exercice.spring.demo.domain.User;
+import com.exercice.spring.demo.dto.ResponseDto;
 import com.exercice.spring.demo.dto.UserDto;
 import com.exercice.spring.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,9 +60,14 @@ public class UserController {
 
     @PostMapping("/saveUser")
     public ModelAndView saveUser(UserDto userDto) {
-        userService.saveUser(userDto);
-        //permet de changer l'url quand on va atterir sur la page de login
-        return new ModelAndView(new RedirectView("login"));
+        ResponseDto<User> responseDto = userService.saveUser(userDto);
+        if(responseDto.getErrorDto() == null) {
+            //permet de changer l'url quand on va atterir sur la page de login
+            return new ModelAndView(new RedirectView("/login")); //
+            // si il n'y a pas d'erreur on redirige vers la page /****
+        } else {
+            return null;// afficher l'erreur sur la page de login
+        }
         //Remarque: si on fait ça :
         //ModelAndView mv = new ModelAndView();
         //mv.setViewName("login");

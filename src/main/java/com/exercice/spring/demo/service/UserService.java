@@ -24,6 +24,11 @@ import org.springframework.util.CollectionUtils;
 import java.time.Instant;
 import java.util.*;
 
+// UserDetailsService classe qui vient de spring security
+// on doit implémenté la interface UserDetailsService dans une classe avec l'annotation @Service
+// cette interface contient une méthode loadUserByUsername
+// on doit redefinir la méthode loadUserByUsername pour dire a spring qu'est ce qu'on doit faire
+// lorsqu'on soumet le formulaire POST /login
 @Service
 public class UserService implements UserDetailsService {
 
@@ -34,7 +39,7 @@ public class UserService implements UserDetailsService {
     private RoleRepository roleRepository;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public List<User> searchUser(UserDto dto) {
         UserSpecification userSpecification = new UserSpecification(dto);
@@ -44,15 +49,10 @@ public class UserService implements UserDetailsService {
     public ResponseDto<User> saveUser(UserDto userDto) {
         ResponseDto<User> responseDto = new ResponseDto<>();
 
-        /*if(UserUtils.isPasswordNotValid(userDto)) {
-            ErrorDto error = new ErrorDto();
-            error.setKey("password");
-            error.setMessage("Passwords must match.");
-            responseDto.setErrorDto(error);
-
-        } else */if (!isEmailAlreadyExistInDatabase(userDto.getEmail())) {
+        // verifier si l'email existe ou pas
+        if (!isEmailAlreadyExistInDatabase(userDto.getEmail())) {
             User user = new User();
-            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            user.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
             user.setEmail(userDto.getEmail());
             user.setFirstName(userDto.getFirstName());
             user.setLastName(userDto.getLastName());
@@ -61,6 +61,8 @@ public class UserService implements UserDetailsService {
 
             if(adminRole.isPresent()) {
                 user.addRoles(adminRole.get());
+                User newUser = userRepository.save(user);
+                responseDto.setObject(newUser);
             } else {
                 ErrorDto error = new ErrorDto();
                 error.setKey("role");
@@ -68,13 +70,10 @@ public class UserService implements UserDetailsService {
                 responseDto.setErrorDto(error);
             }
 
-            User newUser = userRepository.save(user);
-            responseDto.setObject(newUser);
-
         } else {
             ErrorDto error = new ErrorDto();
             error.setKey("email");
-            error.setMessage("Email is already used");
+            error.setMessage("Email is already used IN DATABSE");
             responseDto.setErrorDto(error);
         }
 
@@ -82,25 +81,47 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    @Transactional
+    @Transactional // l'objetif de cette méthode est de retourner l'objet UserDETAILS qui est un objet
+    // de spring de spring security.
+    // cette objet UserDetails doit contenir l'email le password crypté et la liste des roles de l'utilisateur
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(userName).get();
-        List<GrantedAuthority> authorities = getUserAuthority(user.getRoles());
-        return buildUserForAuthentication(user, authorities);
+        // on recupere le user de la base de doonées à partir de son mail
+        Optional<User> user = userRepository.findByEmail(userName);
+        if(user.isPresent()) {
+            // on recupere la liste des role de l'utilisateur
+            Set<Role> userRoles = user.get().getRoles();
+
+            // on convert la list des roles en list de SimpleGrantedAuthority ( qui est la
+            // classe de spring security qui contient les roles
+            List<SimpleGrantedAuthority> authorities = getUserAuthority(userRoles);
+
+            UserDetails userDetails = getUserDetails(user.get(), authorities);
+
+            return userDetails;
+        } else {
+            throw new UsernameNotFoundException("message user n'existe pas");
+        }
     }
 
-    private List<GrantedAuthority> getUserAuthority(Set<Role> userRoles) {
-        Set<GrantedAuthority> roles = new HashSet<GrantedAuthority>();
+    private List<SimpleGrantedAuthority> getUserAuthority(Set<Role> userRoles) {
+        // interface GrantedAuthority vient de spring security
+        // qui va contenir les roles de l'utilisateur qui sont définis dans la base de doonées
+
+        List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
+
         for (Role role : userRoles) {
-            roles.add(new SimpleGrantedAuthority(role.getRole()));
+            grantedAuthorities.add(new SimpleGrantedAuthority(role.getRole()));
         }
 
-        List<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>(roles);
         return grantedAuthorities;
     }
 
-    private UserDetails buildUserForAuthentication(User user, List<GrantedAuthority> authorities) {
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), Boolean.TRUE, true, true, true, authorities);
+    private UserDetails getUserDetails(User user, List<SimpleGrantedAuthority> authorities) {
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), Boolean.TRUE,
+                true,
+                true,
+                true,
+                authorities);
     }
 
     private boolean isEmailAlreadyExistInDatabase(String email) {
