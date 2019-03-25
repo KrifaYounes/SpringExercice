@@ -34,8 +34,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         //5. les paramètres du formulaire doivent comporter deux input avec comme name email et password
         //6. lorsque l'utilisateur demande la page /logout il est déconnecté puis redirigé vers la page /logn
 
-
-
         httpSecurity
                 .authorizeRequests()// lena sar appel de la methode  .authorizeRequests()  qui va retourner un object
                 // qui sera utiliser  comme entrer pour tous les methos loutanin eli houma antMatchers()
